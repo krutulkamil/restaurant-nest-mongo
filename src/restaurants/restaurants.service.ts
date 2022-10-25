@@ -38,4 +38,8 @@ export class RestaurantsService {
             runValidators: true
         });
     };
+
+    async deleteById(id: string): Promise<Restaurant> {
+        return this.restaurantModel.findByIdAndDelete(id)
+    };
 }
