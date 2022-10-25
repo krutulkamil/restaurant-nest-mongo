@@ -11,18 +11,25 @@ export class RestaurantsService {
     constructor(
         @InjectModel(Restaurant.name)
         private readonly restaurantModel: mongoose.Model<Restaurant>
-    ) {}
+    ) {};
 
     async findAll(query: Query): Promise<Restaurant[]> {
+        const resultsPerPage: number = 5;
+        const currentPage: number = Number(query.page) || 1;
+        const skip: number = resultsPerPage * (currentPage - 1);
 
         const keyword = query.keyword ? {
             name: {
                 $regex: query.keyword,
                 $options: 'i'
             }
-        } : {}
+        } : {};
 
-        const restaurants = await this.restaurantModel.find({ ...keyword });
+        const restaurants = await this.restaurantModel
+            .find({ ...keyword })
+            .limit(resultsPerPage)
+            .skip(skip);
+
         return restaurants;
     };
 
