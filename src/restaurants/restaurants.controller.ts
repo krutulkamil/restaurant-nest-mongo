@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { RestaurantsService } from './restaurants.service';
 import { Restaurant } from './schemas/restaurant.schema';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('restaurants')
 export class RestaurantsController {
@@ -42,5 +43,15 @@ export class RestaurantsController {
                 deleted: true
             }
         }
+    };
+
+    @Put('upload/:id')
+    @UseInterceptors(FilesInterceptor('files'))
+    async uploadFiles(
+        @Param('id') id: string,
+        @UploadedFiles() files: Array<Express.Multer.File>
+    ) {
+        console.log(id);
+        console.log(files);
     };
 }
