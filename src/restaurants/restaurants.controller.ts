@@ -34,14 +34,20 @@ export class RestaurantsController {
 
     @Delete(':id')
     async deleteRestaurant(@Param('id') id: string): Promise<{ deleted: boolean }> {
-        await this.restaurantsService.findById(id);
+        const restaurant = await this.restaurantsService.findById(id);
 
-        const restaurant = await this.restaurantsService.deleteById(id);
+        const isDeleted = await this.restaurantsService.deleteImages(restaurant.images);
+        if (isDeleted) {
+            await this.restaurantsService.deleteById(id);
 
-        if (restaurant) {
             return {
                 deleted: true
             };
+
+        } else {
+            return {
+                deleted: false
+            }
         }
     };
 

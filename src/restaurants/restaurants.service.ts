@@ -74,5 +74,10 @@ export class RestaurantsService {
                 new: true,
                 runValidators: true
             });
-    }
+    };
+
+    async deleteImages(images) {
+        if (images.length === 0) return true;
+        return await APIFeatures.deleteImages(images);
+    };
 }
