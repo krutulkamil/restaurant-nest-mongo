@@ -12,7 +12,8 @@ export class RestaurantsService {
     constructor(
         @InjectModel(Restaurant.name)
         private readonly restaurantModel: mongoose.Model<Restaurant>
-    ) {};
+    ) {
+    };
 
     async findAll(query: Query): Promise<Restaurant[]> {
         const resultsPerPage: number = 5;
@@ -43,7 +44,7 @@ export class RestaurantsService {
         const isValidId = mongoose.isValidObjectId(id);
 
         if (!isValidId) {
-            throw new BadRequestException('Wrong mongoose ID error. Please enter correct ID.')
+            throw new BadRequestException('Wrong mongoose ID error. Please enter correct ID.');
         }
 
         const restaurant = await this.restaurantModel.findById(id);
@@ -63,10 +64,15 @@ export class RestaurantsService {
     };
 
     async deleteById(id: string): Promise<Restaurant> {
-        return this.restaurantModel.findByIdAndDelete(id)
+        return this.restaurantModel.findByIdAndDelete(id);
     };
 
     async uploadImages(id: string, files: Array<Express.Multer.File>) {
-        return await APIFeatures.upload(files);
+        const images = await APIFeatures.upload(files);
+        return this.restaurantModel.findByIdAndUpdate(id, { images: images as Object[] },
+            {
+                new: true,
+                runValidators: true
+            });
     }
 }
