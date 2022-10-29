@@ -26,20 +26,17 @@ export class RestaurantsService {
             }
         } : {};
 
-        const restaurants = await this.restaurantModel
+        return this.restaurantModel
             .find({ ...keyword })
             .limit(resultsPerPage)
             .skip(skip);
-
-        return restaurants;
     };
 
     async create(restaurantDto: CreateRestaurantDto): Promise<Restaurant> {
         const location = await APIFeatures.getRestaurantLocation(restaurantDto.address);
         const data = Object.assign(restaurantDto, { location });
 
-        const restaurant = await this.restaurantModel.create(data);
-        return restaurant;
+        return await this.restaurantModel.create(data);
     };
 
     async findById(id: string): Promise<Restaurant> {
@@ -68,4 +65,8 @@ export class RestaurantsService {
     async deleteById(id: string): Promise<Restaurant> {
         return this.restaurantModel.findByIdAndDelete(id)
     };
+
+    async uploadImages(id: string, files: Array<Express.Multer.File>) {
+        return await APIFeatures.upload(files);
+    }
 }

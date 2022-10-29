@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { RestaurantsService } from './restaurants.service';
 import { Restaurant } from './schemas/restaurant.schema';
@@ -41,7 +41,7 @@ export class RestaurantsController {
         if (restaurant) {
             return {
                 deleted: true
-            }
+            };
         }
     };
 
@@ -51,7 +51,7 @@ export class RestaurantsController {
         @Param('id') id: string,
         @UploadedFiles() files: Array<Express.Multer.File>
     ) {
-        console.log(id);
-        console.log(files);
+        await this.restaurantsService.findById(id);
+        return await this.restaurantsService.uploadImages(id, files);
     };
 }

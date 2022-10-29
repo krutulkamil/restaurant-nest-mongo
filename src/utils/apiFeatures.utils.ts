@@ -1,3 +1,5 @@
+import { S3 } from 'aws-sdk';
+
 const nodeGeoCoder = require('node-geocoder');
 import { Location } from '../restaurants/schemas/restaurant.schema';
 
@@ -29,5 +31,38 @@ export default class APIFeatures {
         } catch (error) {
             console.log(error.message);
         }
+    };
+
+    static async upload(files) {
+        return new Promise((resolve, reject) => {
+
+            const s3 = new S3({
+                accessKeyId: process.env.AWS_S3_KEY_ID,
+                secretAccessKey: process.env.AWS_S3_ACCESS_KEY
+            });
+
+            let images = [];
+
+            files.forEach(async (file) => {
+                const splitFile = file.originalname.split('.');
+                const random = Date.now();
+
+                const fileName = `${splitFile[0]}_${random}.${splitFile[1]}`;
+
+                const params = {
+                    Bucket: `${process.env.AWS_S3_BUCKET_NAME}/restaurants`,
+                    Key: fileName,
+                    Body: file.buffer
+                };
+
+                const uploadResponse = await s3.upload(params).promise();
+
+                images.push(uploadResponse);
+
+                if (images.length === files.length) {
+                    resolve(images);
+                }
+            })
+        });
     }
 }
