@@ -34,7 +34,7 @@ export class MealService {
         }
 
         return meal;
-    }
+    };
 
     async create(meal: Meal, user: User): Promise<Meal> {
         const data = Object.assign(meal, { user: user._id });
@@ -55,5 +55,12 @@ export class MealService {
         await restaurant.save();
 
         return mealCreated;
-    }
+    };
+
+    async updateById(id: string, meal: Meal): Promise<Meal> {
+        return this.mealModel.findByIdAndUpdate(id, meal, {
+            new: true,
+            runValidators: true
+        });
+    };
 }
