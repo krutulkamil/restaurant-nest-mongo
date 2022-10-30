@@ -12,15 +12,22 @@ export class MealController {
 
     @Get()
     async getAllMeals(): Promise<Meal[]> {
-        return this.mealService.findAll();
+        return await this.mealService.findAll();
     };
 
     @Get('restaurant/:id')
     async getMealsByRestaurant(
         @Param('id') id: string
     ): Promise<Meal[]> {
-        return this.mealService.findByRestaurant(id)
+        return await this.mealService.findByRestaurant(id)
     };
+
+    @Get(':id')
+    async getMeal(
+        @Param('id') id: string
+    ): Promise<Meal> {
+        return await this.mealService.findById(id);
+    }
 
     @Post()
     @UseGuards(AuthGuard())
