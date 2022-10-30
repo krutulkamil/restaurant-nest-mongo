@@ -12,6 +12,14 @@ export class MealService {
         @InjectModel(Restaurant.name) private readonly restaurantModel: mongoose.Model<Restaurant>
     ) {};
 
+    async findAll(): Promise<Meal[]> {
+        return this.mealModel.find();
+    };
+
+    async findByRestaurant(id: string): Promise<Meal[]> {
+        return this.mealModel.find({ restaurant: id })
+    };
+
     async create(meal: Meal, user: User): Promise<Meal> {
         const data = Object.assign(meal, { user: user._id });
 
