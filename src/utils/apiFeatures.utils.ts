@@ -1,7 +1,8 @@
 import { S3 } from 'aws-sdk';
+import { JwtService } from '@nestjs/jwt';
+import { Location } from '../restaurants/schemas/restaurant.schema';
 
 const nodeGeoCoder = require('node-geocoder');
-import { Location } from '../restaurants/schemas/restaurant.schema';
 
 export default class APIFeatures {
     static async getRestaurantLocation(address: string) {
@@ -95,5 +96,14 @@ export default class APIFeatures {
                 }
             });
         });
+    };
+
+    static async assignJwtToken(
+        userId: string,
+        jwtService: JwtService
+    ): Promise<string> {
+        const payload = { id: userId };
+
+        return jwtService.sign(payload);
     };
 }
