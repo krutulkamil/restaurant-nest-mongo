@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User } from './schemas/user.schema';
@@ -17,10 +17,14 @@ export class AuthService {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await this.userModel.create({
-            name, email, password: hashedPassword
-        });
-
-        return user;
+        try {
+            return await this.userModel.create({
+                name, email, password: hashedPassword
+            });
+        } catch (error) {
+            if (error.code === 11000) {
+                throw new ConflictException('Duplicate email entered!');
+            }
+        }
     };
 }
