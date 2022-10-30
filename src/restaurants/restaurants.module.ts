@@ -13,7 +13,7 @@ import { AuthModule } from '../auth/auth.module';
         ])
     ],
     controllers: [RestaurantsController],
-    providers: [RestaurantsService]
+    providers: [RestaurantsService],
+    exports: [MongooseModule]
 })
-export class RestaurantsModule {
-}
+export class RestaurantsModule {}
