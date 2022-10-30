@@ -1,5 +1,6 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
+import { IsEmail, IsEmpty, IsEnum, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
 import { Category } from '../schemas/restaurant.schema';
+import { User } from '../../auth/schemas/user.schema';
 
 export class CreateRestaurantDto {
     @IsNotEmpty({ message: 'Name field should not be empty' })
@@ -25,4 +26,7 @@ export class CreateRestaurantDto {
     @IsNotEmpty({ message: 'Category field should not be empty' })
     @IsEnum(Category, { message: 'Please enter correct category' })
     readonly category: Category;
+
+    @IsEmpty({ message: 'You cannot provide the user ID.' })
+    readonly user: User;
 }

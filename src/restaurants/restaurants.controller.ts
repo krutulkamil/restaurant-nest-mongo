@@ -26,32 +26,41 @@ export class RestaurantsController {
     constructor(private readonly restaurantsService: RestaurantsService) {};
 
     @Get()
-    @UseGuards(AuthGuard())
     async getAllRestaurants(
-        @Query() query: ExpressQuery,
-        @CurrentUser() user: User
+        @Query() query: ExpressQuery
     ): Promise<Restaurant[]> {
         return await this.restaurantsService.findAll(query);
     };
 
     @Post()
-    async createRestaurant(@Body() restaurantDto: CreateRestaurantDto): Promise<Restaurant> {
-        return await this.restaurantsService.create(restaurantDto);
+    @UseGuards(AuthGuard())
+    async createRestaurant(
+        @Body() restaurantDto: CreateRestaurantDto,
+        @CurrentUser() user: User
+    ): Promise<Restaurant> {
+        return await this.restaurantsService.create(restaurantDto, user);
     };
 
     @Get(':id')
-    async getRestaurant(@Param('id') id: string): Promise<Restaurant> {
+    async getRestaurant(
+        @Param('id') id: string
+    ): Promise<Restaurant> {
         return await this.restaurantsService.findById(id);
     };
 
     @Put(':id')
-    async updateRestaurant(@Param('id') id: string, @Body() restaurantDto: UpdateRestaurantDto): Promise<Restaurant> {
+    async updateRestaurant(
+        @Param('id') id: string,
+        @Body() restaurantDto: UpdateRestaurantDto
+    ): Promise<Restaurant> {
         await this.restaurantsService.findById(id);
         return await this.restaurantsService.updateById(id, restaurantDto);
     };
 
     @Delete(':id')
-    async deleteRestaurant(@Param('id') id: string): Promise<{ deleted: boolean }> {
+    async deleteRestaurant(
+        @Param('id') id: string
+    ): Promise<{ deleted: boolean }> {
         const restaurant = await this.restaurantsService.findById(id);
 
         const isDeleted = await this.restaurantsService.deleteImages(restaurant.images);
@@ -65,7 +74,7 @@ export class RestaurantsController {
         } else {
             return {
                 deleted: false
-            }
+            };
         }
     };
 

@@ -6,6 +6,7 @@ import { Restaurant } from './schemas/restaurant.schema';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import APIFeatures from '../utils/apiFeatures.utils';
+import { User } from '../auth/schemas/user.schema';
 
 @Injectable()
 export class RestaurantsService {
@@ -33,9 +34,9 @@ export class RestaurantsService {
             .skip(skip);
     };
 
-    async create(restaurantDto: CreateRestaurantDto): Promise<Restaurant> {
+    async create(restaurantDto: CreateRestaurantDto, user: User): Promise<Restaurant> {
         const location = await APIFeatures.getRestaurantLocation(restaurantDto.address);
-        const data = Object.assign(restaurantDto, { location });
+        const data = Object.assign(restaurantDto, { user: user._id, location });
 
         return await this.restaurantModel.create(data);
     };
