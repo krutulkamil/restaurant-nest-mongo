@@ -141,4 +141,15 @@ describe('RestaurantService', () => {
             expect(updatedRestaurant.name).toEqual(updatedRestaurant.name);
         });
     });
+
+    describe('deleteById', () => {
+        it('should delete the restaurant', async () => {
+            const deleteMessage = { deleted: true };
+            jest.spyOn(model, 'findByIdAndDelete')
+                .mockResolvedValueOnce(deleteMessage as any);
+
+            const result = await service.deleteById(mockRestaurant._id);
+            expect(result).toEqual(deleteMessage);
+        });
+    });
 });
