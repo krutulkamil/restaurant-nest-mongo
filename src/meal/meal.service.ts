@@ -63,4 +63,17 @@ export class MealService {
             runValidators: true
         });
     };
+
+    async deleteById(id: string): Promise<{ deleted: boolean }> {
+        const meal = await this.mealModel.findById(id);
+        const restaurant = await this.restaurantModel.findOne({ menu: meal });
+
+        restaurant.menu = restaurant.menu.filter(meals => meal.id.toString() !== meals.toString());
+        await restaurant.save();
+
+        const response = await this.mealModel.findByIdAndDelete(id);
+
+        if (response) return { deleted: true };
+        return { deleted: false };
+    };
 }
