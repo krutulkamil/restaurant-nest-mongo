@@ -3,6 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { RestaurantsController } from './restaurants.controller';
 import { RestaurantsService } from './restaurants.service';
 import { UserRoles } from '../auth/schemas/user.schema';
+import { ForbiddenException } from '@nestjs/common';
 
 const mockRestaurant = {
     _id: '635fa337ab4946e81213a56c',
@@ -41,7 +42,8 @@ const mockUser = {
 const mockRestaurantService = {
     findAll: jest.fn().mockResolvedValueOnce([mockRestaurant]),
     create: jest.fn(),
-    findById: jest.fn().mockResolvedValueOnce(mockRestaurant)
+    findById: jest.fn().mockResolvedValueOnce(mockRestaurant),
+    updateById: jest.fn()
 };
 
 describe('RestaurantsController', () => {
@@ -70,7 +72,7 @@ describe('RestaurantsController', () => {
 
     describe('getAllRestaurants', () => {
         it('should get all restaurants', async () => {
-            const result = await controller.getAllRestaurants({ keyword: 'restaurant'});
+            const result = await controller.getAllRestaurants({ keyword: 'restaurant' });
 
             expect(service.findAll).toHaveBeenCalled();
             expect(result).toEqual([mockRestaurant]);
@@ -93,7 +95,7 @@ describe('RestaurantsController', () => {
             const result = await controller.createRestaurant(newRestaurant as any, mockUser as any);
 
             expect(service.create).toHaveBeenCalled();
-            expect(result).toEqual(mockRestaurant)
+            expect(result).toEqual(mockRestaurant);
         });
     });
 
@@ -103,6 +105,34 @@ describe('RestaurantsController', () => {
 
             expect(service.findById).toHaveBeenCalled();
             expect(result).toEqual(mockRestaurant);
+        });
+    });
+
+    describe('updateRestaurant', () => {
+        const restaurant = { ...mockRestaurant, name: 'Updated name' };
+        const updateRestaurant = { name: 'Updated name' };
+
+        it('should update restaurant by ID', async () => {
+            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(restaurant);
+
+            mockRestaurantService.updateById = jest.fn().mockResolvedValueOnce(restaurant);
+
+            const result = await controller.updateRestaurant(restaurant._id, updateRestaurant as any, mockUser as any);
+
+            expect(service.updateById).toHaveBeenCalled();
+            expect(result).toEqual(restaurant);
+            expect(result.name).toEqual(restaurant.name);
+        });
+
+        it('should throw forbidden error', async () => {
+            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(restaurant);
+
+            const user = {
+                ...mockUser,
+                _id: 'wrongid'
+            };
+
+            await expect(controller.updateRestaurant(restaurant._id, updateRestaurant as any, user as any)).rejects.toThrow(ForbiddenException);
         });
     });
 });
