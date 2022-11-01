@@ -198,10 +198,37 @@ describe('RestaurantService', () => {
                     e bytes>`,
                     size: 276307
                 }
-            ]
+            ];
 
             const result = await service.uploadImages(mockRestaurant._id, files as any);
             expect(result).toEqual(updatedRestaurant);
+        });
+    });
+
+    describe('deleteImages', () => {
+        it('should delete restaurant images from S3 Bucket', async () => {
+            const mockImages = [
+                {
+                    ETag: '"fde2a82dbb1596531209fcdb9638f732"',
+                    Location: 'https://nest-restaurants-api.s3.amazonaws.com/restaurants/TEAM-1_1667131773236.jpg',
+                    key: 'restaurants/TEAM-1_1667131773236.jpg',
+                    Key: 'restaurants/TEAM-1_1667131773236.jpg',
+                    Bucket: 'nest-restaurants-api'
+                },
+                {
+                    ETag: '"2f54e7ecb45aeff727ec88c98b99ce6c"',
+                    Location: 'https://nest-restaurants-api.s3.amazonaws.com/restaurants/hero-background_1667131773214.jpg',
+                    key: 'restaurants/hero-background_1667131773214.jpg',
+                    Key: 'restaurants/hero-background_1667131773214.jpg',
+                    Bucket: 'nest-restaurants-api'
+                }
+            ];
+
+            jest.spyOn(APIFeatures, 'deleteImages')
+                .mockResolvedValueOnce(true)
+
+            const result = await service.deleteImages(mockImages);
+            expect(result).toBe(true);
         });
     });
 });
