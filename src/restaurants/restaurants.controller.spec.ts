@@ -39,7 +39,8 @@ const mockUser = {
 };
 
 const mockRestaurantService = {
-    findAll: jest.fn().mockResolvedValueOnce([mockRestaurant])
+    findAll: jest.fn().mockResolvedValueOnce([mockRestaurant]),
+    create: jest.fn()
 };
 
 describe('RestaurantsController', () => {
@@ -72,6 +73,26 @@ describe('RestaurantsController', () => {
 
             expect(service.findAll).toHaveBeenCalled();
             expect(result).toEqual([mockRestaurant]);
+        });
+    });
+
+    describe('createRestaurant', () => {
+        it('should create a new restaurant', async () => {
+            const newRestaurant = {
+                name: 'Vera Napoli',
+                description: 'Italian pizza',
+                email: 'vera.n@gmail.com',
+                phoneNo: 123456789,
+                address: 'Warszawska 23, Katowice, Poland',
+                category: 'Fine Dinning'
+            };
+
+            mockRestaurantService.create = jest.fn().mockResolvedValueOnce(mockRestaurant);
+
+            const result = await controller.createRestaurant(newRestaurant as any, mockUser as any);
+
+            expect(service.create).toHaveBeenCalled();
+            expect(result).toEqual(mockRestaurant)
         });
     });
 });
