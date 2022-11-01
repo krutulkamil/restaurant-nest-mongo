@@ -43,7 +43,9 @@ const mockRestaurantService = {
     findAll: jest.fn().mockResolvedValueOnce([mockRestaurant]),
     create: jest.fn(),
     findById: jest.fn().mockResolvedValueOnce(mockRestaurant),
-    updateById: jest.fn()
+    updateById: jest.fn(),
+    deleteImages: jest.fn().mockResolvedValueOnce(true),
+    deleteById: jest.fn().mockResolvedValueOnce({ deleted: true})
 };
 
 describe('RestaurantsController', () => {
@@ -113,7 +115,7 @@ describe('RestaurantsController', () => {
         const updateRestaurant = { name: 'Updated name' };
 
         it('should update restaurant by ID', async () => {
-            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(restaurant);
+            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(mockRestaurant);
 
             mockRestaurantService.updateById = jest.fn().mockResolvedValueOnce(restaurant);
 
@@ -125,7 +127,7 @@ describe('RestaurantsController', () => {
         });
 
         it('should throw forbidden error', async () => {
-            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(restaurant);
+            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(mockRestaurant);
 
             const user = {
                 ...mockUser,
@@ -133,6 +135,41 @@ describe('RestaurantsController', () => {
             };
 
             await expect(controller.updateRestaurant(restaurant._id, updateRestaurant as any, user as any)).rejects.toThrow(ForbiddenException);
+        });
+    });
+
+    describe('deleteRestaurant', () => {
+        it('should delete restaurant by ID', async () => {
+
+            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(mockRestaurant);
+
+            const result = await controller.deleteRestaurant(mockRestaurant._id, mockUser as any);
+
+            expect(service.deleteById).toHaveBeenCalled();
+            expect(result).toEqual({ deleted: true });
+        });
+
+        it('should not delete restaurant because images are not deleted', async () => {
+
+            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(mockRestaurant);
+
+            mockRestaurantService.deleteImages = jest.fn().mockResolvedValueOnce(false);
+
+            const result = await controller.deleteRestaurant(mockRestaurant._id, mockUser as any);
+
+            expect(service.deleteById).toHaveBeenCalled();
+            expect(result).toEqual({ deleted: false });
+        });
+
+        it('should throw forbidden error', async () => {
+            mockRestaurantService.findById = jest.fn().mockResolvedValueOnce(mockRestaurant);
+
+            const user = {
+                ...mockUser,
+                _id: 'wrongid'
+            };
+
+            await expect(controller.deleteRestaurant(mockRestaurant._id, user as any)).rejects.toThrow(ForbiddenException);
         });
     });
 });
