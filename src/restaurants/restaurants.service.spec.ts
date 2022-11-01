@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
 import { Restaurant } from './schemas/restaurant.schema';
 import { UserRoles } from '../auth/schemas/user.schema';
 import APIFeatures from '../utils/apiFeatures.utils';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 const mockRestaurant = {
     _id: '635fa337ab4946e81213a56c',
@@ -49,7 +49,7 @@ const mockRestaurantService = {
     findByIdAndDelete: jest.fn()
 };
 
-describe('RestaurantService', () => {
+describe('RestaurantsService', () => {
     let service: RestaurantsService;
     let model: Model<Restaurant>;
 
