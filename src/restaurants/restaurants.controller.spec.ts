@@ -40,7 +40,8 @@ const mockUser = {
 
 const mockRestaurantService = {
     findAll: jest.fn().mockResolvedValueOnce([mockRestaurant]),
-    create: jest.fn()
+    create: jest.fn(),
+    findById: jest.fn().mockResolvedValueOnce(mockRestaurant)
 };
 
 describe('RestaurantsController', () => {
@@ -93,6 +94,15 @@ describe('RestaurantsController', () => {
 
             expect(service.create).toHaveBeenCalled();
             expect(result).toEqual(mockRestaurant)
+        });
+    });
+
+    describe('getRestaurant', () => {
+        it('should get restaurant by ID', async () => {
+            const result = await controller.getRestaurant(mockRestaurant._id);
+
+            expect(service.findById).toHaveBeenCalled();
+            expect(result).toEqual(mockRestaurant);
         });
     });
 });
