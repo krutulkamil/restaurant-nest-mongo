@@ -144,12 +144,64 @@ describe('RestaurantService', () => {
 
     describe('deleteById', () => {
         it('should delete the restaurant', async () => {
-            const deleteMessage = { deleted: true };
             jest.spyOn(model, 'findByIdAndDelete')
-                .mockResolvedValueOnce(deleteMessage as any);
+                .mockResolvedValueOnce(mockRestaurant as any);
 
             const result = await service.deleteById(mockRestaurant._id);
-            expect(result).toEqual(deleteMessage);
+            expect(result).toEqual(mockRestaurant);
+        });
+    });
+
+    describe('uploadImages', () => {
+        it('should upload restaurant images on S3 Bucket', async () => {
+            const mockImages = [
+                {
+                    ETag: '"fde2a82dbb1596531209fcdb9638f732"',
+                    Location: 'https://nest-restaurants-api.s3.amazonaws.com/restaurants/TEAM-1_1667131773236.jpg',
+                    key: 'restaurants/TEAM-1_1667131773236.jpg',
+                    Key: 'restaurants/TEAM-1_1667131773236.jpg',
+                    Bucket: 'nest-restaurants-api'
+                },
+                {
+                    ETag: '"2f54e7ecb45aeff727ec88c98b99ce6c"',
+                    Location: 'https://nest-restaurants-api.s3.amazonaws.com/restaurants/hero-background_1667131773214.jpg',
+                    key: 'restaurants/hero-background_1667131773214.jpg',
+                    Key: 'restaurants/hero-background_1667131773214.jpg',
+                    Bucket: 'nest-restaurants-api'
+                }
+            ];
+
+            const updatedRestaurant = { ...mockRestaurant, images: mockImages };
+
+            jest.spyOn(APIFeatures, 'upload')
+                .mockResolvedValueOnce(mockImages);
+
+            jest.spyOn(model, 'findByIdAndUpdate')
+                .mockResolvedValueOnce(updatedRestaurant as any);
+
+            const files = [
+                {
+                    fieldname: 'files',
+                    originalname: 'TEAM-1.jpg',
+                    encoding: '7bit',
+                    mimetype: 'image/jpeg',
+                    buffer: `<Buffer ff d8 ff e2 0c 58 49 43 43 5f 50 52 4f 46 49 4c 45 00 01 01 00 00 0c 48 4c 69 6e 6f 02 10 00 00 6d 6e 74 72 52 47 42 20 58 59 5a 20 07 ce 00 02 00 09 ... 121698 mor
+                    e bytes>`,
+                    size: 121748
+                },
+                {
+                    fieldname: 'files',
+                    originalname: 'TEAM-1@2x.jpg',
+                    encoding: '7bit',
+                    mimetype: 'image/jpeg',
+                    buffer: `<Buffer ff d8 ff e2 0c 58 49 43 43 5f 50 52 4f 46 49 4c 45 00 01 01 00 00 0c 48 4c 69 6e 6f 02 10 00 00 6d 6e 74 72 52 47 42 20 58 59 5a 20 07 ce 00 02 00 09 ... 276257 mor
+                    e bytes>`,
+                    size: 276307
+                }
+            ]
+
+            const result = await service.uploadImages(mockRestaurant._id, files as any);
+            expect(result).toEqual(updatedRestaurant);
         });
     });
 });
