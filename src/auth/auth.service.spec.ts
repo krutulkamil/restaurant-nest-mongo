@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { AuthService } from './auth.service';
@@ -19,7 +19,8 @@ const mockUser = {
 const token = 'jwtToken';
 
 const mockAuthService = {
-    create: jest.fn()
+    create: jest.fn(),
+    findOne: jest.fn()
 };
 
 describe('AuthService', () => {
@@ -52,7 +53,6 @@ describe('AuthService', () => {
     });
 
     describe('signup', () => {
-
         const signUpDto = {
             name: 'krutulkamil',
             email: 'krutulkamil@onet.pl',
@@ -80,6 +80,54 @@ describe('AuthService', () => {
                 .mockImplementationOnce(() => Promise.reject({ code: 11000 }));
 
             await expect(service.signUp(signUpDto)).rejects.toThrow(ConflictException);
+        });
+    });
+
+    describe('login', () => {
+        const loginDto = {
+            email: 'krutulkamil@onet.pl',
+            password: 'test12345'
+        };
+
+        it('should login user and return the token', async () => {
+            jest.spyOn(model, 'findOne')
+                .mockImplementationOnce(() => ({
+                    select: jest.fn().mockResolvedValueOnce(mockUser)
+                } as any ));
+
+            jest.spyOn(bcrypt, 'compare')
+                .mockResolvedValueOnce(true);
+
+            jest.spyOn(APIFeatures, 'assignJwtToken')
+                .mockResolvedValueOnce(token);
+
+            const result = await service.login(loginDto);
+
+            expect(result.token).toEqual(token);
+        });
+
+        it('should throw invalid email error', async () => {
+            jest.spyOn(model, 'findOne')
+                .mockImplementationOnce(() => ({
+                    select: jest.fn().mockResolvedValueOnce(null)
+                } as any ));
+
+            await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
+        });
+
+        it('should throw invalid password error', async () => {
+            jest.spyOn(model, 'findOne')
+                .mockImplementationOnce(() => ({
+                    select: jest.fn().mockResolvedValueOnce(mockUser)
+                } as any ));
+
+            jest.spyOn(bcrypt, 'compare')
+                .mockResolvedValueOnce(false);
+
+            jest.spyOn(APIFeatures, 'assignJwtToken')
+                .mockResolvedValueOnce(token);
+
+            await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
         });
     });
 });
