@@ -46,4 +46,18 @@ describe('AuthController', () => {
             expect(result).toEqual(jwtToken);
         });
     });
+
+    describe('login', () => {
+        it('should login a user', async () => {
+            const loginDto = {
+                email: 'krutulkamil@onet.pl',
+                password: 'test12345'
+            };
+
+            const result = await controller.login(loginDto);
+
+            expect(service.login).toHaveBeenCalled();
+            expect(result).toEqual(jwtToken);
+        });
+    });
 });
