@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import * as mongoose from 'mongoose';
 import { AppModule } from '../src/app.module';
 
-describe('AuthController (e2e)', () => {
+describe('RestaurantsController (e2e)', () => {
     let app: INestApplication;
 
     beforeEach(async () => {
@@ -14,12 +14,6 @@ describe('AuthController (e2e)', () => {
 
         app = moduleFixture.createNestApplication();
         await app.init();
-    });
-
-    beforeAll(() => {
-        mongoose.connect(process.env.DB_URI_LOCAL, () => {
-            mongoose.connection.db.dropDatabase();
-        });
     });
 
     afterAll(() => {
@@ -32,15 +26,16 @@ describe('AuthController (e2e)', () => {
         password: 'test12345'
     };
 
-    it('(POST) - register a new user', () => {
-        return request(app.getHttpServer())
-            .post('/auth/signup')
-            .send(user)
-            .expect(201)
-            .then((res) => {
-                expect(res.body.token).toBeDefined();
-            });
-    });
+    const newRestaurant = {
+        name: 'Vera Napoli',
+        description: 'Italian pizza',
+        email: 'vera.n@gmail.com',
+        phoneNo: 123456789,
+        address: 'Warszawska 23, Katowice, Poland',
+        category: 'Fine Dinning'
+    };
+
+    let jwtToken: string;
 
     it('(GET) - login user', () => {
         return request(app.getHttpServer())
@@ -49,6 +44,19 @@ describe('AuthController (e2e)', () => {
             .expect(200)
             .then((res) => {
                 expect(res.body.token).toBeDefined();
+                jwtToken = res.body.token;
+            })
+    });
+
+    it('(POST) - creates a new restaurant', () => {
+        return request(app.getHttpServer())
+            .post('/restaurants')
+            .set('Authorization', 'Bearer ' + jwtToken)
+            .send(newRestaurant)
+            .expect(201)
+            .then((res) => {
+                expect(res.body._id).toBeDefined();
+                expect(res.body.name).toEqual(newRestaurant.name);
             });
     });
 });
