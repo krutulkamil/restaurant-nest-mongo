@@ -46,7 +46,7 @@ describe('RestaurantsController (e2e)', () => {
             .then((res) => {
                 expect(res.body.token).toBeDefined();
                 jwtToken = res.body.token;
-            })
+            });
     });
 
     it('(POST) - creates a new restaurant', () => {
@@ -78,6 +78,29 @@ describe('RestaurantsController (e2e)', () => {
             .then((res) => {
                 expect(res.body).toBeDefined();
                 expect(res.body._id).toEqual(restaurantCreated._id);
+            });
+    });
+
+    it('(PUT) - update restaurant by ID', () => {
+        return request(app.getHttpServer())
+            .put(`/restaurants/${restaurantCreated._id}`)
+            .set('Authorization', 'Bearer ' + jwtToken)
+            .send({ name: 'Updated name' })
+            .expect(200)
+            .then((res) => {
+                expect(res.body).toBeDefined();
+                expect(res.body.name).toEqual('Updated name');
+            });
+    });
+
+    it('(DELETE) - delete restaurant by ID', () => {
+        return request(app.getHttpServer())
+            .delete(`/restaurants/${restaurantCreated._id}`)
+            .set('Authorization', 'Bearer ' + jwtToken)
+            .expect(200)
+            .then((res) => {
+                expect(res.body).toBeDefined();
+                expect(res.body.deleted).toEqual(true);
             });
     });
 });
