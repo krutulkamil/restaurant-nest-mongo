@@ -5,6 +5,7 @@
 # env files
 .env
 .env.development
+.env.test
 
 # Logs
 logs

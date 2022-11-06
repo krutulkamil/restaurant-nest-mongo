@@ -10,7 +10,7 @@ import { MealModule } from './meal/meal.module';
 @Module({
   imports: [
       ConfigModule.forRoot({
-          envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+          envFilePath: `.env.${process.env.NODE_ENV}`,
           isGlobal: true
       }),
       MongooseModule.forRoot(process.env.DB_URI_LOCAL),
