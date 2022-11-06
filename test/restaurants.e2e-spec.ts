@@ -36,6 +36,7 @@ describe('RestaurantsController (e2e)', () => {
     };
 
     let jwtToken: string;
+    let restaurantCreated;
 
     it('(GET) - login user', () => {
         return request(app.getHttpServer())
@@ -57,6 +58,26 @@ describe('RestaurantsController (e2e)', () => {
             .then((res) => {
                 expect(res.body._id).toBeDefined();
                 expect(res.body.name).toEqual(newRestaurant.name);
+                restaurantCreated = res.body;
+            });
+    });
+
+    it('(GET) - get all restaurants', () => {
+        return request(app.getHttpServer())
+            .get('/restaurants')
+            .expect(200)
+            .then((res) => {
+                expect(res.body.length).toBe(1);
+            });
+    });
+
+    it('(GET) - get restaurant by ID', () => {
+        return request(app.getHttpServer())
+            .get(`/restaurants/${restaurantCreated._id}`)
+            .expect(200)
+            .then((res) => {
+                expect(res.body).toBeDefined();
+                expect(res.body._id).toEqual(restaurantCreated._id);
             });
     });
 });
